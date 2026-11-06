@@ -1,0 +1,34 @@
+! $OpenBSD: dot.Xdefaults,v 1.3 2014/07/10 10:22:59 jasper Exp $
+XTerm*loginShell:true
+
+XTerm*faceName: Adwaita Mono
+XTerm*faceSize: 16
+
+XTerm*background: #151515 
+XTerm*foreground: #d5d5d5
+
+! Enable the scrollbar
+xterm*scrollBar: false
+
+! Mouse wheel scroll in manpages
+XTerm*alternateScroll: true
+
+! Modern look for TUI apps
+XTerm*termName: xterm-256color
+! Use UTF-8 even when the desktop starts without locale variables.
+XTerm*locale: false
+XTerm*utf8: always
+
+! Let interactive terminal apps receive mouse events such as wheel scrolling.
+XTerm*allowMouseOps: true
+! Use the system clipboard for selection and paste.
+XTerm*selectToClipboard: true
+
+! Key Bindings & Translations
+XTerm.vt100.translations: #override \n\
+    Ctrl Shift <Key> C: copy-selection(CLIPBOARD) \n\
+    Ctrl Shift <Key> V: insert-selection(CLIPBOARD) \n\
+    Ctrl <Key> plus: larger-vt-font() \n\
+    Ctrl <Key> minus: smaller-vt-font() \n\
+    <Key>F11: fullscreen(toggle) \n\
+    Alt <Key>Return: insert()
