@@ -8,8 +8,9 @@ Run inside the repo:
 
   stow --no-folding --target="$HOME" xdefaults
   stow --no-folding --target="$HOME" memes
+  stow --no-folding --target="$HOME" ksh
 
-This installs .Xdefaults and the meme in ~/Pictures/memes/.
+This installs .Xdefaults, the meme in ~/Pictures/memes/, and ~/.kshrc.
 Stow creates missing folders and stops if a target conflicts.
 Use --no-folding to keep new folders real, not symlinks.
 
@@ -17,6 +18,7 @@ To undo:
 
   stow --no-folding --delete --target="$HOME" xdefaults
   stow --no-folding --delete --target="$HOME" memes
+  stow --no-folding --delete --target="$HOME" ksh
 
 SYSTEM-WIDE CONFIGS
 
