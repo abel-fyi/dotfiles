@@ -1,0 +1,28 @@
+# Appearance
+borderwidth 2
+color activeborder "#ffbf00"
+
+# Movement: 10 pixels; Shift moves 10 times as much.
+# Applications such as xterm may resize in their own increments.
+moveamount 10
+
+# Key bindings
+# Spanish (Spain) PC105: use the US positions for punctuation shortcuts.
+unbind-key M-slash
+unbind-key C-slash
+unbind-key M-grave
+unbind-key MS-grave
+unbind-key M-question
+
+bind-key M-minus      menu-window
+bind-key C-minus      menu-cmd
+bind-key M-masculine  window-cycle-inclass
+bind-key MS-masculine window-rcycle-inclass
+bind-key M-underscore menu-exec
+
+# Notes
+# CM-g group feedback: blue adds the focused window; red removes it.
+# Current group: xprop -root _NET_CURRENT_DESKTOP
+
+# Patch to list all windows when menu-window opens (requires rebuilding CWM):
+# https://www.mail-archive.com/misc%40openbsd.org/msg198400.html
