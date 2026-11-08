@@ -16,7 +16,7 @@ XTerm*alternateScroll: true
 ! Some TUI apps handle mouse events themselves
 ! for scrolling and selection. (e.g codex)
 ! Hold Shift while selecting to bypass their mouse handling
-! and copy xterm's text.
+! and copy xterm text.
 
 XTerm*allowMouseOps: true
 ! Selection and middle-click use PRIMARY; Ctrl+Shift+C/V use CLIPBOARD.
