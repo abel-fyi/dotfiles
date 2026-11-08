@@ -9,12 +9,18 @@ XTerm*loginShell: true
 XTerm*termName: xterm-256color
 XTerm*locale: false
 XTerm*utf8: always
-xterm*scrollBar: false
+XTerm*scrollBar: false
 XTerm*alternateScroll: true
 
-! Mouse input and clipboard
+! PRO TIP:
+! Some TUI apps handle mouse events themselves
+! for scrolling and selection. (e.g codex)
+! Hold Shift while selecting to bypass their mouse handling
+! and copy xterm's text.
+
 XTerm*allowMouseOps: true
-XTerm*selectToClipboard: true
+! Selection and middle-click use PRIMARY; Ctrl+Shift+C/V use CLIPBOARD.
+XTerm*selectToClipboard: false
 
 ! Key bindings
 ! F11 toggles fullscreen; F12 toggles reverse video.
