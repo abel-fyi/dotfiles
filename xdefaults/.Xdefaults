@@ -1,7 +1,8 @@
 ! XTerm appearance
 XTerm*background: #151515
 XTerm*foreground: #d5d5d5
-XTerm*faceName: Adwaita Mono
+! Monospace stays primary; emoji font is an optional Xft fallback.
+XTerm*faceName: Monospace,Noto Color Emoji
 XTerm*faceSize: 15
 
 ! Terminal behavior
