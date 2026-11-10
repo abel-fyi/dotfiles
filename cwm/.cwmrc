@@ -6,7 +6,7 @@ color activeborder "#ffbf00"
 # Applications such as xterm may resize in their own increments.
 moveamount 10
 
-# Key bindings
+# Linux Key bindings
 bind-key CM-Return "xterm"
 bind-key F4 "brightnessctl --quiet set 5%-"
 bind-key F5 "brightnessctl --quiet set +5%"
@@ -15,19 +15,6 @@ bind-key XF86MonBrightnessUp   "brightnessctl --quiet set +5%"
 bind-key XF86AudioLowerVolume  "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
 bind-key XF86AudioRaiseVolume  "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
 bind-key XF86AudioMute         "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-
-# Spanish (Spain) PC105: use the US positions for punctuation shortcuts.
-#unbind-key M-slash
-#unbind-key C-slash
-#unbind-key M-grave
-#unbind-key MS-grave
-#unbind-key M-question
-#
-#bind-key M-minus      menu-window
-#bind-key C-minus      menu-cmd
-#bind-key M-masculine  window-cycle-inclass
-#bind-key MS-masculine window-rcycle-inclass
-#bind-key M-underscore menu-exec
 
 # Use US keyboard positions for default shortcuts, regardless of layout.
 physical-defaults yes
