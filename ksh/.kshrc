@@ -112,3 +112,9 @@ export LSCOLORS=ExFxBxDxCxegedabagacad
 
 export EDITOR=vi
 export VISUAL=vi
+
+# --------------------------------------------------
+# Command-line editing
+# --------------------------------------------------
+
+set -o emacs
