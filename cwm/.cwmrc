@@ -1,59 +1,144 @@
-# Appearance
-borderwidth 2
-color activeborder "#ffbf00"
+# ~/.cwmrc - portable, keyboard-first configuration for cwm(1)
+#
+# Philosophy: retain every stock key binding and add only what is missing.
+#
+# Key notation in bind-key:
+#   M = Alt / Mod1    C = Ctrl    S = Shift    4 = Super / Mod4
+# For example, MS-3 means Alt+Shift+3.
 
-# Movement: 10 pixels; Shift moves 10 times as much.
-# Applications such as xterm may resize in their own increments.
+
+# -----------------------------------------------------------------------------
+# 1. TERMINAL
+# -----------------------------------------------------------------------------
+
+# Explicitly choose xterm for cwm's terminal action (stock: Ctrl+Alt+Return).
+# This is already cwm's default, but is recorded here intentionally.
+command term xterm
+
+
+# -----------------------------------------------------------------------------
+# 2. APPEARANCE
+# -----------------------------------------------------------------------------
+
+# Make window borders and the menu border 2 pixels thick.
+borderwidth 5
+
+# Highlight the focused window with amber.
+color activeborder "#007000"
+
+# Give the menu border and selected menu row the same amber color.
+color menufg "#007000"
+
+# Optional: dark menu instead of the stock light menu.
+# Uncomment all three lines together; the amber highlight remains unchanged.
+color menubg  "#000000"   # Menu background.
+color font    "#eeeeee"   # Unselected menu text.
+color selfont "#000000"   # Selected text, on the amber highlight.
+
+# Optional: use a monospace font in cwm menus (not inside xterm).
+fontname "monospace:style=Bold:size=15"
+
+# Optional: reserve 8 pixels along each screen edge for maximized windows.
+# Order: top, bottom, left, right. True fullscreen ignores these gaps.
+# gap 8 8 8 8
+
+
+# -----------------------------------------------------------------------------
+# 3. WORKSPACES (cwm calls them "groups")
+# -----------------------------------------------------------------------------
+
+# Put newly opened windows in the currently selected group.
+# Without this, new windows normally start outside any group.
+# This is *sticky group mode*, not the same as a sticky window.
+sticky yes
+
+# Alt+1..9: show only the named group, hiding the other groups.
+bind-key M-1 group-only-1  # Show only group 1.
+bind-key M-2 group-only-2  # Show only group 2.
+bind-key M-3 group-only-3  # Show only group 3.
+bind-key M-4 group-only-4  # Show only group 4.
+bind-key M-5 group-only-5  # Show only group 5.
+bind-key M-6 group-only-6  # Show only group 6.
+bind-key M-7 group-only-7  # Show only group 7.
+bind-key M-8 group-only-8  # Show only group 8.
+bind-key M-9 group-only-9  # Show only group 9.
+
+# Alt+0: toggle visibility of all groups; there is no tenth workspace.
+bind-key M-0 group-toggle-all
+
+# Alt+Shift+1..9: send the focused window to a group without following it.
+bind-key MS-1 window-movetogroup-1  # Send window to group 1.
+bind-key MS-2 window-movetogroup-2  # Send window to group 2.
+bind-key MS-3 window-movetogroup-3  # Send window to group 3.
+bind-key MS-4 window-movetogroup-4  # Send window to group 4.
+bind-key MS-5 window-movetogroup-5  # Send window to group 5.
+bind-key MS-6 window-movetogroup-6  # Send window to group 6.
+bind-key MS-7 window-movetogroup-7  # Send window to group 7.
+bind-key MS-8 window-movetogroup-8  # Send window to group 8.
+bind-key MS-9 window-movetogroup-9  # Send window to group 9.
+
+# Alt+Backspace: return to the previously active group (and back again).
+bind-key M-BackSpace group-last
+
+# Stock Ctrl+Alt+S already toggles a window's stickiness across all groups.
+# Stock Ctrl+Alt+1..9 still toggles individual groups' visibility.
+
+
+# -----------------------------------------------------------------------------
+# 4. WINDOW MOVEMENT AND ARRANGEMENT
+# -----------------------------------------------------------------------------
+
+# Move or resize by 10 pixels with stock h/j/k/l bindings.
+# Their Shift variants use 10 times this amount: 100 pixels.
 moveamount 10
 
-# Key bindings: Super for CWM, Alt for applications.
-# Deliberately preserved the physical US keyboard positions
-# for my Spanish (Spain) PC105 layout.
-unbind-key all
+# Alt+C: center the focused window without resizing it.
+bind-key M-c window-snap-center
 
-# Menus
-bind-key 4-minus      menu-window
-bind-key C4-minus     menu-cmd
-bind-key 4-g          menu-group
-bind-key 4-underscore menu-exec
+# One-shot tiling: arrange the currently visible windows, then return to
+# ordinary floating behavior. The master gets half the available space.
+# Alt+V: focused window on the left; other windows stacked on the right.
+bind-key M-v window-vtile
 
-# Windows
-bind-key C4-Return    terminal
-bind-key 4-Return     window-hide
-bind-key C4-x         window-close
-bind-key C4-g         window-group
-bind-key 4-Tab        window-cycle
-bind-key 4S-Tab       window-rcycle
-bind-key 4-masculine  window-cycle-inclass
-bind-key 4S-masculine window-rcycle-inclass
+# Alt+Shift+V: focused window on top; other windows arranged below.
+bind-key MS-v window-htile
 
-# Move windows
-bind-key 4-h  window-move-left
-bind-key 4-j  window-move-down
-bind-key 4-k  window-move-up
-bind-key 4-l  window-move-right
-bind-key 4S-h window-move-left-big
-bind-key 4S-j window-move-down-big
-bind-key 4S-k window-move-up-big
-bind-key 4S-l window-move-right-big
+# The built-in move, resize, maximize, fullscreen, hide, cycle and search
+# bindings are deliberately not repeated or changed here.
 
-# Resize windows
-bind-key C4-h  window-resize-left
-bind-key C4-j  window-resize-down
-bind-key C4-k  window-resize-up
-bind-key C4-l  window-resize-right
-bind-key C4S-h window-resize-left-big
-bind-key C4S-j window-resize-down-big
-bind-key C4S-k window-resize-up-big
-bind-key C4S-l window-resize-right-big
 
-# Session
-bind-key C4S-r restart
-bind-key C4S-q quit
+# -----------------------------------------------------------------------------
+# 5. MOUSE BINDINGS
+# -----------------------------------------------------------------------------
 
-# Notes
-# C4-g group feedback: blue adds the focused window; red removes it.
-# Current group: xprop -root _NET_CURRENT_DESKTOP
+# Remove cwm's mouse shortcuts, including root-window mouse menus.
+# Applications still receive normal mouse input; focus policy is unchanged.
+unbind-mouse all
 
-# Patch to list all windows when menu-window opens (requires rebuilding CWM):
-# https://www.mail-archive.com/misc%40openbsd.org/msg198400.html
+
+# -----------------------------------------------------------------------------
+# 6. NOTES / LIMITATIONS (no active settings below this line)
+# -----------------------------------------------------------------------------
+
+# MODIFIER KEY:
+# No global modkey directive exists in cwmrc(5). Most stock shortcuts use
+# Alt (Mod1). A wholesale change requires rebinding each key, changing X11
+# keyboard mappings, or patching cwm itself.
+
+# FOCUS POLICY:
+# cwmrc(5) cannot disable focus-follows-mouse / pointer-related focus behavior.
+# Disabling mouse bindings above does not disable it. Patching cwm would be
+# necessary for a strict keyboard-only focus policy.
+
+# WINDOW MENU:
+# Stock Alt+/ opens menu-window; Ctrl+A then lists all windows.
+# Listing them immediately on opening needs a source patch to menu.c:
+# https://www.mail-archive.com/misc@openbsd.org/msg198400.html
+
+# WINDOW PLACEMENT:
+# cwmrc(5) has no setting to center *every new* window automatically.
+# Use the added Alt+C shortcut to center the focused window on demand.
+
+# X11 KEYBOARD CAUTION (not a cwm shortcut):
+# Ctrl+Alt+Backspace may terminate Xorg when enabled; Backspace is NOT Delete.
+# With startx, terminating Xorg returns to the TTY.
