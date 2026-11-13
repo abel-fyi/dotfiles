@@ -1,120 +1,88 @@
-# Shared OpenBSD / NetBSD ksh configuration
+# Shared interactive rc: Bash (Linux), ksh (OpenBSD and NetBSD)
+case $- in *i*) ;; *) return ;; esac
 
-# --------------------------------------------------
-# Interactive shells only
-# --------------------------------------------------
-
-case $- in
-    *i*) ;;
-    *) return ;;
-esac
-
-# --------------------------------------------------
-# Command history
-# --------------------------------------------------
-
-HISTFILE="$HOME/.ksh_history"
+# History lives under ~/.local/state (or $XDG_STATE_HOME), not ~/.
 HISTSIZE=10000
+_dot_state=${XDG_STATE_HOME:-$HOME/.local/state}/shell
+if mkdir -p -m 700 "$_dot_state" 2>/dev/null; then
+    if [ -n "${BASH_VERSION:-}" ]; then
+        HISTFILE=$_dot_state/bash_history
+        HISTFILESIZE=10000
+    else
+        HISTFILE=$_dot_state/ksh_history
+    fi
+else
+    unset HISTFILE
+fi
 
-# --------------------------------------------------
-# Prompt helpers
-# --------------------------------------------------
+# Prompt colors: red user, orange @, yellow host, green path, blue ❯
+_dot_user=${USER:-$(id -un)}
+_dot_host=$(hostname)
+_dot_host=${_dot_host%%.*}
+_dot_esc=$(printf '\033')
+_dot_bel=$(printf '\007')
+_dot_begin=$(printf '\001')
+if [ -n "${BASH_VERSION:-}" ]; then
+    _dot_end=$(printf '\002')
+    _dot_prefix=
+else
+    _dot_end=$_dot_begin
+    _dot_prefix="$_dot_begin$(printf '\r')"
+fi
+_dot_reset="${_dot_begin}${_dot_esc}[0m${_dot_end}"
+_dot_red="${_dot_begin}${_dot_esc}[1;38;5;196m${_dot_end}"
+_dot_orange="${_dot_begin}${_dot_esc}[1;38;5;208m${_dot_end}"
+_dot_yellow="${_dot_begin}${_dot_esc}[1;38;5;226m${_dot_end}"
+_dot_green="${_dot_begin}${_dot_esc}[1;38;5;46m${_dot_end}"
+_dot_blue="${_dot_begin}${_dot_esc}[1;38;5;75m${_dot_end}"
+_dot_error="${_dot_begin}${_dot_esc}[1;31m${_dot_end}"
+_dot_nl='
+'
 
-# Terminal escape sequences
-_KSH_ESC=$(printf '\033')
-_KSH_BEL=$(printf '\007')
-_KSH_NP=$(printf '\001')
-
-# Display HOME as ~
-__ksh_prompt_pwd() {
+_dot_prompt() {
+    _dot_status=$1
     case $PWD in
-        "$HOME")
-            printf '~'
-            ;;
-        "$HOME"/*)
-            printf '~%s' "${PWD#"$HOME"}"
+        "$HOME") _dot_path='~' ;;
+        "$HOME"/*) _dot_path="~${PWD#"$HOME"}" ;;
+        *) _dot_path=$PWD ;;
+    esac
+
+    case ${TERM:-dumb} in
+        xterm*|screen*|tmux*|rxvt*|alacritty*|foot*)
+            _dot_text="${_dot_prefix}${_dot_begin}${_dot_esc}]0;${PWD}${_dot_bel}${_dot_end}"
+            _dot_text="${_dot_text}${_dot_red}${_dot_user}${_dot_orange}@${_dot_yellow}${_dot_host}"
+            _dot_text="${_dot_text}${_dot_reset} ${_dot_green}${_dot_path}${_dot_reset}${_dot_nl}"
+            [ "$_dot_status" -eq 0 ] || _dot_text="${_dot_text}${_dot_error}✗${_dot_reset} "
+            _dot_text="${_dot_text}${_dot_blue}❯${_dot_reset} "
             ;;
         *)
-            printf '%s' "$PWD"
+            _dot_text="${_dot_user}@${_dot_host} ${_dot_path}${_dot_nl}"
+            [ "$_dot_status" -eq 0 ] || _dot_text="${_dot_text}✗ "
+            _dot_text="${_dot_text}❯ "
             ;;
     esac
-}
-
-# Display a red cross after a failed command
-__ksh_prompt_error() {
-    if [ "$?" -ne 0 ]; then
-        printf '\001\033[1;31m\001✗\001\033[0m\001 '
+    if [ -n "${BASH_VERSION:-}" ]; then
+        printf '%s' "$_dot_text"
+    else
+        print -rn "$_dot_text"  # ksh builtin: no external printf per prompt
     fi
 }
-
-# --------------------------------------------------
-# Prompt
-# --------------------------------------------------
-
-case $TERM in
-    xterm*)
-        PS1="${_KSH_NP}${_KSH_ESC}]0;\${PWD}${_KSH_BEL}${_KSH_NP}"
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[1;38;5;196m${_KSH_NP}\${USER}"
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[1;38;5;208m${_KSH_NP}@"
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[1;38;5;226m${_KSH_NP}\$(hostname -s)"
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[0m${_KSH_NP} "
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[1;38;5;46m${_KSH_NP}\$(__ksh_prompt_pwd)"
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[0m${_KSH_NP}
-"
-        PS1="${PS1}\$(__ksh_prompt_error)"
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[1;38;5;75m${_KSH_NP}❯"
-        PS1="${PS1}${_KSH_NP}${_KSH_ESC}[0m${_KSH_NP} "
-        ;;
-
-    *)
-        PS1='\${USER}@$(hostname -s) $(__ksh_prompt_pwd)
-$(__ksh_prompt_error)❯ '
-        ;;
-esac
-
+PS1='$(_dot_prompt "$?")'
 PS2='> '
-
-# --------------------------------------------------
-# Aliases
-# --------------------------------------------------
 
 alias ll='ls -lah'
 alias la='ls -A'
 alias lt='ls -ltr'
-
 alias c='clear'
-
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+if [ -n "${BASH_VERSION:-}" ]; then
+    alias reload='. "$HOME/.bashrc"'
+else
+    alias reload='. "$HOME/.kshrc"'
+fi
+mkcd() { [ "$#" -eq 1 ] || return 2; mkdir -p "$1" && cd "$1"; }
 
-alias reload='. "$HOME/.kshrc"'
-
-# --------------------------------------------------
-# Functions
-# --------------------------------------------------
-
-mkcd() {
-    [ "$#" -eq 1 ] || return 2
-    mkdir -p "$1" && cd "$1"
-}
-
-# --------------------------------------------------
-# BSD ls colors
-# --------------------------------------------------
-
-export CLICOLOR=1
-export LSCOLORS=ExFxBxDxCxegedabagacad
-
-# --------------------------------------------------
-# Editor
-# --------------------------------------------------
-
-export EDITOR=vi
-export VISUAL=vi
-
-# --------------------------------------------------
-# Command-line editing
-# --------------------------------------------------
-
+export EDITOR=vi VISUAL=vi
 set -o emacs
