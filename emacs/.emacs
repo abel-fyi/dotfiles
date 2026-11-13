@@ -67,4 +67,12 @@
 (fido-vertical-mode 1)
 (winner-mode 1)
 
+;;; LSP
+
+(add-hook 'c-mode-hook #'eglot-ensure)
+
+;; Inline diagnostics; keep echo-area messages to one line.
+(setq flymake-show-diagnostics-at-end-of-line t
+            eldoc-echo-area-use-multiline-p nil)
+
 ;;; .emacs ends here
