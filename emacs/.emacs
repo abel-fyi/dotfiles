@@ -2,77 +2,70 @@
 
 ;;; Interface
 
-;; Start with an empty scratch buffer.
 (setq inhibit-startup-screen t
-      initial-scratch-message nil)
+      initial-scratch-message nil
+      use-short-answers t
+      display-line-numbers-type 'relative
+      scroll-conservatively 101)
 
-;; Relative line numbers, in yellow.
-(setq display-line-numbers-type 'relative)
-(global-display-line-numbers-mode 1)
+(menu-bar-mode -1)
+
+;; Underline the current line without highlighting.
+(global-hl-line-mode 1)
+(set-face-attribute 'hl-line nil
+		    :inherit nil
+		    :underline t
+		    :extend nil)
+
+;; Relative line numbers in programming buffers.
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
 (set-face-attribute 'line-number nil :foreground "yellow")
 (set-face-attribute 'line-number-current-line nil
-                    :foreground "yellow" :weight 'bold)
-(column-number-mode 1)
-
-;; Subtle highlighting in xterm; underlining on limited-color consoles.
-(global-hl-line-mode 1)
-(if (>= (display-color-cells) 256)
-    (set-face-attribute 'hl-line nil
-                        :background "gray15" :extend nil)
-  (set-face-attribute 'hl-line nil
-                      :foreground 'unspecified
-                      :background (face-background 'default)
-                      :underline t :extend nil))
-
-;; F9 toggles the menu bar; F10 opens it.
-(menu-bar-mode -1)
-(global-set-key (kbd "<f9>") #'menu-bar-mode)
+		    :foreground "yellow" :weight 'bold)
 
 ;; Hide line continuation indicators.
 (unless standard-display-table
   (setq standard-display-table (make-display-table)))
 (set-display-table-slot standard-display-table 'wrap ?\s)
 
-
 ;;; Editing
 
-(setq-default indent-tabs-mode nil
-              show-trailing-whitespace t)
-
-(delete-selection-mode 1)
-(setq scroll-conservatively 101)
-
+(setq-default show-trailing-whitespace t)
 
 ;;; Files
 
-;; Keep backups and auto-saves out of working directories.
-(let ((dir (expand-file-name "backups/" user-emacs-directory)))
+(let ((dir (expand-file-name "var/" user-emacs-directory)))
   (make-directory dir t)
-  (setq backup-directory-alist `(("." . ,dir))))
+  (setq backup-directory-alist `(("." . ,dir))
+	auto-save-file-name-transforms `((".*" ,dir sha1))
+	lock-file-name-transforms `((".*" ,dir sha1))))
 
-(let ((dir (expand-file-name "auto-saves/" user-emacs-directory)))
-  (make-directory dir t)
-  (setq auto-save-file-name-transforms `((".*" ,dir t))))
-
-(global-auto-revert-mode 1)
-
-
-;;; Navigation & Persistence
-
-(save-place-mode 1)
-(savehist-mode 1)
-(recentf-mode 1)
-
-(setq use-short-answers t)
-(fido-vertical-mode 1)
-(winner-mode 1)
-
-;;; LSP
+;;; C programming
 
 (add-hook 'c-mode-hook #'eglot-ensure)
 
-;; Inline diagnostics; keep echo-area messages to one line.
-(setq flymake-show-diagnostics-at-end-of-line t
-            eldoc-echo-area-use-multiline-p nil)
+;;; Diagnostics & documentation
+
+(setq flymake-show-diagnostics-at-end-of-line 'short
+      eldoc-echo-area-use-multiline-p nil)
+
+;;; Completion
+
+(use-package corfu
+  :ensure t
+  :hook (c-mode . corfu-mode)
+  :custom
+  (corfu-auto t)
+  (corfu-auto-prefix 1)
+  (corfu-auto-delay 0.2)
+  (corfu-cycle t)
+  (corfu-preselect 'prompt)
+  (corfu-preview-current nil)
+  :bind (:map corfu-map
+	      ("TAB" . corfu-next)
+	      ([tab] . corfu-next)
+	      ("S-TAB" . corfu-previous)
+	      ([backtab] . corfu-previous)))
 
 ;;; .emacs ends here
